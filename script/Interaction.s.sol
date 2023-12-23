@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
-import { Script, console } from "forge-std/Script.sol";
-import { DevOpsTools } from "@chainlink/devops/DevOpsTools.sol";
-import { FundMe } from "../src/FundMe.sol";
+import {Script, console} from "forge-std/Script.sol";
+import {DevOpsTools} from "@chainlink/devops/DevOpsTools.sol";
+import {FundMe} from "../src/FundMe.sol";
 
 contract FundFundMe is Script {
     uint256 constant SEND_VALUE = 0.01 ether;

@@ -2,27 +2,54 @@
 
 pragma solidity 0.8.21;
 
+/* Imports */
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import {PriceConverter} from "./PriceConverter.sol";
 
+/* Error */
 error FundMe__NotOwner();
 
+/**
+ * @title A sample fund collector contract
+ * @author Neeraj Singh
+ * @notice This is the contract for receiving funds from peoples
+ */
 contract FundMe {
     using PriceConverter for uint256;
 
-    address private immutable i_owner;
-    uint256 public constant MINIMUM_USD = 5e18;
+    /* State variables */
+    // Chainlink pricefeed variables
     AggregatorV3Interface private s_priceFeed;
 
+    // FundMe variables
+    uint256 public constant MINIMUM_USD = 5e18;
+    address private immutable i_owner;
     address[] private s_funders;
     mapping(address funder => uint256 amountFunded) private s_addressToAmountFunded;
+
+    /* Functions */
+    modifier onlyOwner() {
+        if (msg.sender != i_owner) revert FundMe__NotOwner();
+        _;
+    }
 
     constructor(address _priceFeed) {
         i_owner = msg.sender;
         s_priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
-    // Get funds from users
+    receive() external payable {
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
+    }
+
+    /**
+     * @dev This is the function that receive funds from user and
+     * and store sender address with balance in array and mapping
+     */
     function fund() public payable {
         // Allow users to send $
         // Have a minimum $ sent 5$
@@ -34,11 +61,14 @@ contract FundMe {
         s_addressToAmountFunded[msg.sender] += msg.value;
     }
 
-    // Withdraw with cheaper gas price
+    /**
+     * @dev This is the function that transfer all funds from contract to owner wallet address
+     * and it uses less gas
+     */
     function cheaperWithdraw() public onlyOwner {
         uint256 fundersLength = s_funders.length;
-        
-        for(uint256 funderIndex = 0; funderIndex < fundersLength; funderIndex++) {
+
+        for (uint256 funderIndex = 0; funderIndex < fundersLength; funderIndex++) {
             address funder = s_funders[funderIndex];
             s_addressToAmountFunded[funder] = 0;
         }
@@ -49,7 +79,10 @@ contract FundMe {
         require(callSuccess, "Send failed");
     }
 
-    // Withdraw funds
+    /**
+     * @dev This is the function that transfer all funds from contract to owner wallet address
+     * and it uses more gas
+     */
     function withdraw() public onlyOwner {
         for (uint256 funderIndex = 0; funderIndex < s_funders.length; funderIndex++) {
             address funder = s_funders[funderIndex];
@@ -70,30 +103,9 @@ contract FundMe {
         require(callSuccess, "Send failed");
     }
 
-    modifier onlyOwner() {
-        if (msg.sender != i_owner) revert FundMe__NotOwner();
-        _;
-    }
-
-    receive() external payable {
-        fund();
-    }
-
-    fallback() external payable {
-        fund();
-    }
-
     /**
      * View / Pure functions (Getters)
      */
-
-    function getVersion() public view returns (uint256) {
-        return s_priceFeed.version();
-    }
-
-    function getPriceFeed() public view returns (AggregatorV3Interface) {
-        return s_priceFeed;
-    }
 
     function getAddressToAmountFunded(address _fundingAddress) external view returns (uint256) {
         return s_addressToAmountFunded[_fundingAddress];
@@ -105,5 +117,13 @@ contract FundMe {
 
     function getOwner() external view returns (address) {
         return i_owner;
+    }
+
+    function getVersion() public view returns (uint256) {
+        return s_priceFeed.version();
+    }
+
+    function getPriceFeed() public view returns (AggregatorV3Interface) {
+        return s_priceFeed;
     }
 }

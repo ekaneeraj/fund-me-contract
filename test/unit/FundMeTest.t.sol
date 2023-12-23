@@ -109,7 +109,6 @@ contract FundMeTest is Test {
         assertEq(startingFundMeBalance + startingOwnerBalance, endingOwnerBalance);
     }
 
-    
     function testCheaperWithdrawFromMultipleFunders() public funded {
         // Arrange
         uint160 numberOfFunders = 10;
