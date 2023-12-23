@@ -15,10 +15,11 @@ docs/
 # Dotenv file
 .env
 
-lib/
 
 .github/
 
 .vscode/
 
 .DS_Store
+
+lib/
