@@ -6,9 +6,6 @@ pragma solidity 0.8.21;
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import {PriceConverter} from "./PriceConverter.sol";
 
-/* Error */
-error FundMe__NotOwner();
-
 /**
  * @title A sample fund collector contract
  * @author Neeraj Singh
@@ -26,6 +23,9 @@ contract FundMe {
     address private immutable i_owner;
     address[] private s_funders;
     mapping(address funder => uint256 amountFunded) private s_addressToAmountFunded;
+
+    /* Error */
+    error FundMe__NotOwner();
 
     /* Functions */
     modifier onlyOwner() {
