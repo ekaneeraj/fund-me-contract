@@ -19,7 +19,7 @@ contract HelperConfig is Script {
 
     constructor() {
         if (block.chainid == 11155111) {
-            activeNetworkConfig = getSepliaEthConfig();
+            activeNetworkConfig = getSepoliaEthConfig();
         } else if (block.chainid == 1) {
             activeNetworkConfig = getMainnetEthConfig();
         } else {
@@ -27,7 +27,7 @@ contract HelperConfig is Script {
         }
     }
 
-    function getSepliaEthConfig() public view returns (NetworkConfig memory) {
+    function getSepoliaEthConfig() public view returns (NetworkConfig memory) {
         NetworkConfig memory sepoliaConfig = NetworkConfig({priceFeed: priceFeedAddressSepolia});
         return sepoliaConfig;
     }
